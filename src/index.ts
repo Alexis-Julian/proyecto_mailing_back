@@ -1,7 +1,6 @@
 import express from "express";
 import Middlewares from "./middlewares";
 import Routes from "./routes";
-
 import { PORT } from "./configuration";
 
 const app = express();
