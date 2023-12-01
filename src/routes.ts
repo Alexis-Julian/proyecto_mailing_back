@@ -1,5 +1,5 @@
 import * as core from "express-serve-static-core";
-
+import { app as Auth } from "./MVC/routes/auth.routes";
 export default (app: core.Express) => {
-	app;
+	app.use("/api/auth", Auth);
 };
