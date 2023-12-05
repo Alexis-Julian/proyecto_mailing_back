@@ -1,3 +1,5 @@
-/* export class User {
-	user: string;
-} */
+export interface User {
+	username: string;
+	email: string;
+	password: string;
+}

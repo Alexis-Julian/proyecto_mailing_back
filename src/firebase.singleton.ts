@@ -1,23 +1,19 @@
+export const abc = 1;
 import { initializeApp } from "firebase/app";
-import { firebaseConfig as Config } from "./configuration";
-import { red, green } from "console-log-colors";
+import { firebaseConfig } from "./configuration";
+import { getFirestore } from "firebase/firestore";
+import { Firestore } from "firebase/firestore";
 
-export default class FirebaseSingleton {
-	static #instance: any;
-	constructor() {
-		const app = initializeApp(Config);
-		app;
-	}
-
-	static getIntance() {
-		if (this.#instance) {
-			console.log(red("Already connected DB"));
-			return this.#instance;
+export function IntializeFireBase<T extends { new (...args: any[]): {} }>(
+	baseClass: T,
+	_context: any
+) {
+	return class extends baseClass {
+		db: Firestore;
+		constructor(...args: any[]) {
+			super(...args);
+			initializeApp(firebaseConfig);
+			this.db = getFirestore();
 		}
-		this.#instance = new FirebaseSingleton();
-
-		console.log(green("Connected"));
-
-		return this.#instance;
-	}
+	};
 }

@@ -1,11 +1,12 @@
 import express from "express";
 import { Login } from "../controller/auth.controller";
-import UserDao from "../../DTO/auth-login.dto";
-
+import { UserDao } from "../../DAO/firebase/user.dao";
 export const app = express.Router();
 
-app.post("/login", UserDao(["email", "password"]), Login);
+const asd = new UserDao();
+app.post("/login", Login);
 
 app.post("/register", (_, res) => {
-	console.log(res.send("1"));
+	asd.getCollection();
+	res.send("1");
 });
