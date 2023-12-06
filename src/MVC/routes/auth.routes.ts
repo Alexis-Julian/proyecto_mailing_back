@@ -7,6 +7,5 @@ const asd = new UserDao();
 app.post("/login", Login);
 
 app.post("/register", (_, res) => {
-	asd.getCollection();
-	res.send("1");
+  res.send(asd.findbyId("1"));
 });

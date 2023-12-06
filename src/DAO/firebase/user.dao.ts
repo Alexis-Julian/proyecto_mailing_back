@@ -1,23 +1,28 @@
-import { collection, Firestore, getDocs } from "firebase/firestore";
+import { doc, collection, Firestore } from "firebase/firestore";
 import { User } from "../../schemas/user.schema";
 import { IntializeFireBase } from "../../firebase.singleton";
+import { extractCollection, extractDocument } from "../../utils/utils.firebase";
+
+// Sacar los any de cada funcion
+
 @IntializeFireBase
 export class UserDao {
-	db: Firestore | any;
+  db: Firestore | any;
 
-	async getCollection(): Promise<User[] | []> {
-		const itemsCollection = collection(this.db, "test");
-		const snapshot = await getDocs(itemsCollection);
-		const data = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-		console.log(data);
-		return [];
-	}
+  async getCollection(): Promise<User[] | [] | any> {
+    const itemsCollection = collection(this.db, "test");
+    return await extractCollection(itemsCollection);
+  }
 
-	addUser() {}
+  addUser() {}
 
-	removeUser() {}
+  removeUser() {}
 
-	findUpdate() {}
+  findUpdate() {}
 
-	findbyId() {}
+  async findbyId(_id: string): Promise<User[] | [] | any> {
+    const document = doc(this.db, "test", "probando");
+
+    return await extractDocument(document);
+  }
 }
