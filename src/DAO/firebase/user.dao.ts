@@ -1,28 +1,57 @@
-import { doc, collection, Firestore } from "firebase/firestore";
+import {
+	addDoc,
+	deleteDoc,
+	doc,
+	collection,
+	Firestore,
+} from "firebase/firestore";
 import { User } from "../../schemas/user.schema";
 import { IntializeFireBase } from "../../firebase.singleton";
 import { extractCollection, extractDocument } from "../../utils/utils.firebase";
 
 // Sacar los any de cada funcion
+//Las devoluciones del las funciones estan mal aplicadas
 
 @IntializeFireBase
 export class UserDao {
-  db: Firestore | any;
+	db: Firestore | any;
 
-  async getCollection(): Promise<User[] | [] | any> {
-    const itemsCollection = collection(this.db, "test");
-    return await extractCollection(itemsCollection);
-  }
+	async getCollection(): Promise<User[] | [] | any> {
+		try {
+			const itemsCollection = collection(this.db, "user");
+			return await extractCollection(itemsCollection);
+		} catch {
+			return null;
+		}
+	}
 
-  addUser() {}
+	async addUser(userCreate: any): Promise<User[] | [] | any> {
+		try {
+			const itemcolllection = collection(this.db, "user");
+			return await addDoc(itemcolllection, userCreate);
+		} catch {
+			return null;
+		}
+	}
 
-  removeUser() {}
+	async removeUser(id: string): Promise<User[] | [] | any> {
+		try {
+			return await deleteDoc(doc(this.db, "user", id));
+		} catch {
+			return null;
+		}
+	}
 
-  findUpdate() {}
+	findUpdate() {}
 
-  async findbyId(_id: string): Promise<User[] | [] | any> {
-    const document = doc(this.db, "test", "probando");
+	async findbyEmail() {}
 
-    return await extractDocument(document);
-  }
+	async findbyId(id: string): Promise<User[] | [] | any> {
+		try {
+			const document = doc(this.db, "user", id);
+			return await extractDocument(document);
+		} catch {
+			return null;
+		}
+	}
 }
