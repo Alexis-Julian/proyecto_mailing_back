@@ -1,4 +1,4 @@
-/* export class authLoginDTo {
-	@IsEmail()
+export interface AuthLogin {
 	email: string;
-} */
+	password: string;
+}

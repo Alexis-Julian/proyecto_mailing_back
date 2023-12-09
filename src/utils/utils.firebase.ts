@@ -1,23 +1,24 @@
 import {
-  getDocs,
-  getDoc,
-  CollectionReference,
-  DocumentData,
-  DocumentReference,
+	getDocs,
+	getDoc,
+	CollectionReference,
+	DocumentData,
+	DocumentReference,
+	Query,
 } from "firebase/firestore";
 export async function extractCollection(
-  ref: CollectionReference<DocumentData, DocumentData>
+	ref: CollectionReference<DocumentData, DocumentData> | Query<DocumentData>
 ) {
-  const snapshot = await getDocs(ref);
-  const data = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-  return data;
+	const snapshot = await getDocs(ref);
+	const data = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+	return data;
 }
 
 export async function extractDocument(
-  ref: DocumentReference<DocumentData | DocumentData>
+	ref: DocumentReference<DocumentData | DocumentData>
 ) {
-  const snapshot = await getDoc(ref);
-  if (snapshot.exists()) return { id: snapshot.id, ...snapshot.data() };
+	const snapshot = await getDoc(ref);
+	if (snapshot.exists()) return { id: snapshot.id, ...snapshot.data() };
 
-  return null;
+	return null;
 }

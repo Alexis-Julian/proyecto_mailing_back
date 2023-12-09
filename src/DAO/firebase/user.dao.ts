@@ -4,8 +4,10 @@ import {
 	doc,
 	collection,
 	Firestore,
+	query,
+	where,
 } from "firebase/firestore";
-import { User } from "../../schemas/user.schema";
+import { UserSchema } from "../../schemas/user.schema";
 import { IntializeFireBase } from "../../firebase.singleton";
 import { extractCollection, extractDocument } from "../../utils/utils.firebase";
 
@@ -16,7 +18,7 @@ import { extractCollection, extractDocument } from "../../utils/utils.firebase";
 export class UserDao {
 	db: Firestore | any;
 
-	async getCollection(): Promise<User[] | [] | any> {
+	async getCollection(): Promise<UserSchema[] | [] | any> {
 		try {
 			const itemsCollection = collection(this.db, "user");
 			return await extractCollection(itemsCollection);
@@ -25,7 +27,7 @@ export class UserDao {
 		}
 	}
 
-	async addUser(userCreate: any): Promise<User[] | [] | any> {
+	async addUser(userCreate: any): Promise<UserSchema[] | [] | any> {
 		try {
 			const itemcolllection = collection(this.db, "user");
 			return await addDoc(itemcolllection, userCreate);
@@ -34,7 +36,7 @@ export class UserDao {
 		}
 	}
 
-	async removeUser(id: string): Promise<User[] | [] | any> {
+	async removeUser(id: string): Promise<UserSchema[] | [] | any> {
 		try {
 			return await deleteDoc(doc(this.db, "user", id));
 		} catch {
@@ -44,9 +46,15 @@ export class UserDao {
 
 	findUpdate() {}
 
-	async findbyEmail() {}
+	async findbyEmail(email: string): Promise<UserSchema[] | any> {
+		const filter = query(
+			collection(this.db, "user"),
+			where("email", "==", email)
+		);
+		return await extractCollection(filter);
+	}
 
-	async findbyId(id: string): Promise<User[] | [] | any> {
+	async findbyId(id: string): Promise<UserSchema[] | [] | any> {
 		try {
 			const document = doc(this.db, "user", id);
 			return await extractDocument(document);
