@@ -1,7 +1,8 @@
 export { Login, Register };
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import { UserService } from "../service/auth.service";
 import { AuthLogin } from "../../DTO/auth-login.dto";
+// import { HttpErrorConstructor } from "http-errors";
 
 // Servicio para manipulara a los controladores
 const ServiceUser = new UserService();
@@ -12,8 +13,11 @@ const Login = (req: Request, res: Response) => {
 	res.send(ServiceUser.AuthLogin(userLogin));
 };
 
-const Register = (req: Request, res: Response) => {
+const Register = async (req: Request, res: Response, next: NextFunction) => {
 	const userRegister = req.body;
-
-	res.send(ServiceUser.AuthRegister(userRegister));
+	try {
+		res.send(await ServiceUser.AuthRegister(userRegister));
+	} catch (err) {
+		next(err);
+	}
 };
