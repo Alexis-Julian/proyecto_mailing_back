@@ -2,18 +2,27 @@ import { DocumentReference } from "firebase/firestore";
 import { UserDao as DaoUser } from "../../DAO/firebase/user.dao";
 import { AuthLogin } from "../../DTO/auth-login.dto";
 import { AuthRegister } from "../../DTO/auth-register.dto";
-import { HashPassword } from "../../libs/bcrypt";
+import { ComparePassword, HashPassword } from "../../libs/bcrypt";
 import * as createError from "http-errors";
+import { createToken } from "../../libs/jwt";
 
 const UserDao = new DaoUser();
 
 export class UserService {
 	async AuthLogin({ email, password }: AuthLogin): Promise<any> {
-		console.log(password);
-		const findEmail = await UserDao.findbyEmail(email);
+		const user = await UserDao.findbyEmail(email);
 
-		if (!findEmail) return null;
-		//Seguir parte Bcrypt
+		if (!user) return null;
+
+		const result = await ComparePassword(password, user[0].password);
+
+		if (!result) throw new createError.Unauthorized("Passowrd wrong");
+
+		const token = await createToken({ result }, "1h");
+
+		return token;
+
+		throw new createError.InternalServerError("Error Syntax");
 	}
 
 	async AuthRegister(RegisterObject: AuthRegister): Promise<any> {
@@ -28,7 +37,7 @@ export class UserService {
 
 		const response: DocumentReference = await UserDao.addUser(newUser);
 
-		if (response) return "User created";
+		if (response.id) return "User created";
 
 		throw new createError.InternalServerError("Error Syntax");
 	}

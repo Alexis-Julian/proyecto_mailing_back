@@ -7,10 +7,13 @@ import { AuthLogin } from "../../DTO/auth-login.dto";
 // Servicio para manipulara a los controladores
 const ServiceUser = new UserService();
 
-const Login = (req: Request, res: Response) => {
+const Login = async (req: Request, res: Response, next: NextFunction) => {
 	const userLogin: AuthLogin = req.body;
-
-	res.send(ServiceUser.AuthLogin(userLogin));
+	try {
+		res.send(await ServiceUser.AuthLogin(userLogin));
+	} catch (err) {
+		next(err);
+	}
 };
 
 const Register = async (req: Request, res: Response, next: NextFunction) => {
