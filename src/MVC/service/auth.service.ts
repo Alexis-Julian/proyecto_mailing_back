@@ -1,10 +1,11 @@
-import { DocumentReference } from "firebase/firestore";
+// import { DocumentReference } from "firebase/firestore";
 import { UserDao as DaoUser } from "../../DAO/firebase/user.dao";
 import { AuthLogin } from "../../DTO/auth-login.dto";
 import { AuthRegister } from "../../DTO/auth-register.dto";
 import { ComparePassword, HashPassword } from "../../libs/bcrypt";
 import * as createError from "http-errors";
 import { createToken } from "../../libs/jwt";
+import { DocumentReference } from "firebase/firestore";
 
 const UserDao = new DaoUser();
 
@@ -21,8 +22,6 @@ export class UserService {
 		const token = await createToken({ result }, "1h");
 
 		return token;
-
-		throw new createError.InternalServerError("Error Syntax");
 	}
 
 	async AuthRegister(RegisterObject: AuthRegister): Promise<any> {
@@ -37,8 +36,10 @@ export class UserService {
 
 		const response: DocumentReference = await UserDao.addUser(newUser);
 
-		if (response.id) return "User created";
+		if (!response.id) return null;
 
-		throw new createError.InternalServerError("Error Syntax");
+		const token = createToken(RegisterObject, "1h");
+
+		return token;
 	}
 }
