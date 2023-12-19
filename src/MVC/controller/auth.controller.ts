@@ -10,7 +10,10 @@ const ServiceUser = new UserService();
 const Login = async (req: Request, res: Response, next: NextFunction) => {
 	const userLogin: AuthLogin = req.body;
 	try {
-		res.send(await ServiceUser.AuthLogin(userLogin));
+		await ServiceUser.AuthLogin(userLogin);
+		console.log(req.session);
+		//req.session.user = { token: "1" };
+		res.send("probando");
 	} catch (err) {
 		next(err);
 	}
