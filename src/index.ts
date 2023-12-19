@@ -9,32 +9,21 @@ a; */
 
 const app = express();
 
-const serviceAccount = require("../serviceAccountKey.json");
+const credentials = require("../serviceAccountKey.json");
 
 // Utiliza el objeto serviceAccount
 
-admin.initializeApp({
-	credential: admin.credential.cert(serviceAccount),
-	databaseURL: "https://proyecto-email-3fc0f-default-rtdb.firebaseio.com",
-});
+admin.initializeApp({ credential: admin.credential.cert(credentials) });
 
-const db = admin.database();
-
-const ref = db.ref("/Probando");
-const probando = async () => {
-	/* const a = await ref.once("value");
-	console.log(a); */
-
-	// Ejemplo de escritura de datos
-	await ref.set({ key: "value" });
-};
-
-probando();
+/* admin.auth().createUser({
+  email: "probando1@gmail.com",
+  password: "123456",
+}); */
 
 Middlewares(app); //MiddleWares
 
 Routes(app);
 
 app.listen(PORT, () => {
-	console.log("Server listening PORT 8080");
+  console.log("Server listening PORT 8080");
 });
