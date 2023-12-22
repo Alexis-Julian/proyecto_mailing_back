@@ -8,7 +8,7 @@ import {
 
 export const app = express.Router();
 
-app.put("/modify", modifyEmail);
+app.put("/modify/:email", modifyEmail);
 
 app.get("/", getEmail);
 

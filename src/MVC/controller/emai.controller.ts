@@ -1,12 +1,23 @@
-import { Request, Response } from "express";
+import { Request, Response, NextFunction } from "express";
+import * as createError from "http-errors";
 
 import serviceEmail from "../service/email.service";
 
 const emailService = new serviceEmail();
-emailService;
-export const modifyEmail = (req: Request, res: Response) => {
-	req;
-	res.send("Probando");
+
+export const modifyEmail = async (
+	req: Request,
+	res: Response,
+	next: NextFunction
+) => {
+	const { email } = req.params;
+	try {
+		res.send(await emailService.modifyEmail(email));
+	} catch (err) {
+		err = new createError.NotFound("Email not found");
+
+		next(err);
+	}
 };
 
 export const getEmail = (req: Request, res: Response) => {

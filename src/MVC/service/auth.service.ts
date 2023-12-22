@@ -6,6 +6,7 @@ import { ComparePassword, HashPassword } from "../../libs/bcrypt";
 import * as createError from "http-errors";
 import { createToken } from "../../libs/jwt";
 import { DocumentReference } from "firebase/firestore";
+import { firebase } from "../../firebase-config";
 
 const UserDao = new DaoUser();
 
@@ -41,5 +42,19 @@ export class UserService {
 		const token = createToken(RegisterObject, "1h");
 
 		return token;
+	}
+
+	async AuthToken(token: string | undefined) {
+		if (!token) throw new createError.Unauthorized("Token not valid");
+
+		return firebase
+			.auth()
+			.verifyIdToken(token)
+			.then((response) => {
+				return response;
+			})
+			.catch(() => {
+				throw new createError.Unauthorized("Token not valid");
+			});
 	}
 }
