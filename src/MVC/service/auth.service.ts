@@ -1,45 +1,48 @@
 // import { DocumentReference } from "firebase/firestore";
-import { UserDao as DaoUser } from "../../DAO/firebase/user.dao";
 import { AuthLogin } from "../../DTO/auth-login.dto";
 import { AuthRegister } from "../../DTO/auth-register.dto";
-import { ComparePassword, HashPassword } from "../../libs/bcrypt";
-import * as createError from "http-errors";
-import { createToken } from "../../libs/jwt";
-import { DocumentReference } from "firebase/firestore";
-import { firebase } from "../../firebase-config";
 
-const UserDao = new DaoUser();
+// import { ComparePassword } from "../../libs/bcrypt";
+import * as createError from "http-errors";
+// import { createToken } from "../../libs/jwt";
+import { db, firebase } from "../../firebase-config";
+import { doc, setDoc } from "firebase/firestore";
+import { UserRecord } from "firebase-admin/lib/auth/user-record";
+import { auth } from "../../firebase-config";
+
+import { UserCredential, createUserWithEmailAndPassword } from "firebase/auth";
 
 export class UserService {
 	async AuthLogin({ email, password }: AuthLogin): Promise<any> {
-		const user = await UserDao.findbyEmail(email);
-
-		if (!user) return null;
-
-		const result = await ComparePassword(password, user[0].password);
-
-		if (!result) throw new createError.Unauthorized("Passowrd wrong");
-
-		const token = await createToken({ result }, "1h");
-
-		return token;
+		const response = await createUserWithEmailAndPassword(
+			auth,
+			email,
+			password
+		);
+		console.log(response);
 	}
 
 	async AuthRegister(RegisterObject: AuthRegister): Promise<any> {
-		const user: Array<any> = await UserDao.findbyEmail(RegisterObject.email);
+		const { email, name, lastname, password } = RegisterObject;
 
-		if (user.length > 0) throw new createError.Conflict("User already created");
+		const createOtherFields = async (id: string) => {
+			const result = await setDoc(doc(db, "users", id), {
+				name,
+				lastname,
+			});
 
-		const newUser = {
-			...RegisterObject,
-			password: await HashPassword(RegisterObject.password),
+			return result;
 		};
 
-		const response: DocumentReference = await UserDao.addUser(newUser);
+		const response: UserCredential | any = await createUserWithEmailAndPassword(
+			auth,
+			email,
+			password
+		);
 
-		if (!response.id) return null;
+		const user = createOtherFields(response.user.uid);
 
-		const token = createToken(RegisterObject, "1h");
+		const token = response.user.stsTokenManager.accessToken;
 
 		return token;
 	}

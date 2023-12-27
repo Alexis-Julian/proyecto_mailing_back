@@ -1,7 +1,7 @@
-import { firebase } from "../../firebase-config";
-
+/* import { firebase } from "../../firebase-config";
+ */
 export default class emailService {
-	async modifyEmail(email: string) {
+	async modifyEmail(_email: string) {
 		/* 	const response = (await firebase.auth().getUserByEmail(email))
 			.providerData[0];
  */
