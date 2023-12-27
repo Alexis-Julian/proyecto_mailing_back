@@ -1,16 +1,13 @@
-/* import { firebase } from "../../firebase-config";
- */
+import { setDoc, getDoc } from "firebase/firestore";
+import { adminApp } from "../../firebase-config";
 export default class emailService {
-	async modifyEmail(_email: string) {
-		/* 	const response = (await firebase.auth().getUserByEmail(email))
-			.providerData[0];
- */
-		/* return response; */
-	}
+	async modifyEmail(_email: string) {}
+
 	getEmail(email: string) {
 		return email;
 	}
-	saveEmail(email: string) {
+	async saveEmail(email: string) {
+		/* adminApp.firestore(). */
 		return email;
 	}
 	deleteEmail(email: string) {

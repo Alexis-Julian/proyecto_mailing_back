@@ -1,4 +1,5 @@
-import * as admin from "firebase-admin";
+import admin from "firebase-admin";
+
 import { getFirestore } from "firebase/firestore";
 import { initializeApp } from "firebase/app";
 import { firebaseConfig } from "./configuration";
@@ -6,12 +7,12 @@ import { firebaseConfig } from "./configuration";
 import { getAuth } from "firebase/auth";
 const credentials = require("../serviceAccountKey.json");
 
-export const firebase = admin.initializeApp({
+const app = initializeApp(firebaseConfig);
+
+export const adminApp = admin.initializeApp({
 	credential: admin.credential.cert(credentials),
 });
 
-const app = initializeApp(firebaseConfig);
+export const db = getFirestore(); //FireStore
 
-export const db = getFirestore(app);
-
-export const auth = getAuth(app);
+export const auth = getAuth(); //GetAuth

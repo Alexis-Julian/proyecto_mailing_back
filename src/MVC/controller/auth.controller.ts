@@ -13,10 +13,7 @@ export const Login = async (
 ) => {
 	const userLogin: AuthLogin = req.body;
 	try {
-		await ServiceUser.AuthLogin(userLogin);
-		console.log(req.session);
-		//req.session.user = { token: "1" };
-		res.send("probando");
+		res.send(await ServiceUser.AuthLogin(userLogin));
 	} catch (err) {
 		next(err);
 	}

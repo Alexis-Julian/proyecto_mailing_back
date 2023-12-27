@@ -3,35 +3,51 @@ import { AuthLogin } from "../../DTO/auth-login.dto";
 import { AuthRegister } from "../../DTO/auth-register.dto";
 
 // import { ComparePassword } from "../../libs/bcrypt";
-import * as createError from "http-errors";
+import createHttpError, * as createError from "http-errors";
 // import { createToken } from "../../libs/jwt";
-import { db, firebase } from "../../firebase-config";
-import { doc, setDoc } from "firebase/firestore";
-import { UserRecord } from "firebase-admin/lib/auth/user-record";
+import { db, adminApp } from "../../firebase-config";
+
+import { doc, getDoc, setDoc } from "firebase/firestore";
+
 import { auth } from "../../firebase-config";
 
-import { UserCredential, createUserWithEmailAndPassword } from "firebase/auth";
+import {
+	UserCredential,
+	signInWithEmailAndPassword,
+	createUserWithEmailAndPassword,
+} from "firebase/auth";
+import { createToken } from "../../libs/jwt";
 
 export class UserService {
 	async AuthLogin({ email, password }: AuthLogin): Promise<any> {
-		const response = await createUserWithEmailAndPassword(
-			auth,
-			email,
-			password
-		);
-		console.log(response);
+		const getOtherFields = async (id: string) => {
+			const docSnap = await getDoc(doc(db, "users", id));
+
+			if (docSnap.exists()) {
+				return docSnap.data();
+			} else {
+				throw createHttpError(404, "User not found");
+			}
+		};
+
+		const response = await signInWithEmailAndPassword(auth, email, password);
+
+		const userOtherFields = await getOtherFields(response.user.uid);
+
+		const user = {
+			uid: response.user.uid,
+			email: response.user.email,
+			...userOtherFields,
+		};
+
+		return await createToken(user, "1d");
 	}
 
 	async AuthRegister(RegisterObject: AuthRegister): Promise<any> {
 		const { email, name, lastname, password } = RegisterObject;
 
 		const createOtherFields = async (id: string) => {
-			const result = await setDoc(doc(db, "users", id), {
-				name,
-				lastname,
-			});
-
-			return result;
+			await setDoc(doc(db, "users", id), { name, lastname, emails: [] });
 		};
 
 		const response: UserCredential | any = await createUserWithEmailAndPassword(
@@ -40,9 +56,11 @@ export class UserService {
 			password
 		);
 
-		const user = createOtherFields(response.user.uid);
+		await createOtherFields(response.user.uid);
 
-		const token = response.user.stsTokenManager.accessToken;
+		const payload = { email, name, lastname, uid: response.user.uid };
+
+		const token = createToken(payload, "1d");
 
 		return token;
 	}
@@ -50,7 +68,7 @@ export class UserService {
 	async AuthToken(token: string | undefined) {
 		if (!token) throw new createError.Unauthorized("Token not valid");
 
-		return firebase
+		return adminApp
 			.auth()
 			.verifyIdToken(token)
 			.then((response) => {

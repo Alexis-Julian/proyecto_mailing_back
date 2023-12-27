@@ -25,9 +25,18 @@ export const getEmail = (req: Request, res: Response) => {
 	res.send("Probando");
 };
 
-export const saveEmail = (req: Request, res: Response) => {
+export const saveEmail = async (
+	req: Request,
+	res: Response,
+	next: NextFunction
+) => {
 	req;
-	res.send("Probando");
+	try {
+		const email = "111";
+		res.send(await emailService.saveEmail(email));
+	} catch (err) {
+		next(err);
+	}
 };
 
 export const deleteEmail = (req: Request, res: Response) => {
