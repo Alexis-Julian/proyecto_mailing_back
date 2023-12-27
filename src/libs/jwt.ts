@@ -1,17 +1,25 @@
 import jwt from "jsonwebtoken";
+import { JWT } from "../shares/constants";
 import "dotenv/config";
-
+import { UserObject } from "../middlewares/verifyToken";
 export function createToken(payload: any, expire: any) {
 	/* Expire : 1hs : 1h , 1day: 1d */
 	return new Promise((resolve, reject) => {
-		jwt.sign(payload, "JSONWEBTOKEN", { expiresIn: expire }, (e, token) => {
+		jwt.sign(payload, JWT, { expiresIn: expire }, (e, token) => {
 			if (e) reject(e);
 			resolve(token);
 		});
 	});
 }
 
-// export function validateToken(token) {}
+export function validateToken(token: string): Promise<any> {
+	return new Promise((resolve, reject) => {
+		jwt.verify(token, JWT, (e, token) => {
+			if (e) reject(e);
+			resolve(token);
+		});
+	});
+}
 
 const firebaseProjectId = process.env.APPID_FIREBASE;
 // const token = "tu-token-jwt";

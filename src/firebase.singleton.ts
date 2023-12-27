@@ -1,6 +1,6 @@
 export const abc = 1;
 import { initializeApp } from "firebase/app";
-import { firebaseConfig } from "./configuration";
+import { firebaseConfig } from "./shares/constants";
 import { getFirestore } from "firebase/firestore";
 import { Firestore } from "firebase/firestore";
 

@@ -2,9 +2,9 @@ import admin from "firebase-admin";
 
 import { getFirestore } from "firebase/firestore";
 import { initializeApp } from "firebase/app";
-import { firebaseConfig } from "./configuration";
-
+import { firebaseConfig } from "./shares/constants";
 import { getAuth } from "firebase/auth";
+
 const credentials = require("../serviceAccountKey.json");
 
 const app = initializeApp(firebaseConfig);

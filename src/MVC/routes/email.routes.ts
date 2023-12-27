@@ -12,6 +12,6 @@ app.put("/modify/:email", modifyEmail);
 
 app.get("/", getEmail);
 
-app.post("/save", saveEmail);
+app.post("/save/:email", saveEmail);
 
 app.delete("/remove", deleteEmail);

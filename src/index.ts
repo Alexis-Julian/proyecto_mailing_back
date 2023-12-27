@@ -1,7 +1,7 @@
 import express from "express";
 import Middlewares from "./middlewares";
 import Routes from "./routes";
-import { PORT } from "./configuration";
+import { PORT } from "./shares/constants";
 // import { firebaseConfig } from "./configuration";
 /* import { a } from "./test";
 a; */

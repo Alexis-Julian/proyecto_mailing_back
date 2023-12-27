@@ -1,6 +1,8 @@
 import "dotenv/config";
 
-export const PORT = 8080;
+export const PORT = 8080 as const;
+
+export const JWT = "JSONWEBTOKEN";
 
 export const firebaseConfig = {
 	apiKey: process.env.APIKEY_FIREBASE,
@@ -10,4 +12,4 @@ export const firebaseConfig = {
 	messagingSenderId: "737092560040",
 	appId: process.env.APPID_FIREBASE,
 	measurementId: "G-YZRNX0GPZV",
-};
+} as const;

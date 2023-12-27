@@ -30,10 +30,12 @@ export const saveEmail = async (
 	res: Response,
 	next: NextFunction
 ) => {
-	req;
 	try {
-		const email = "111";
-		res.send(await emailService.saveEmail(email));
+		const uid = req.headers.uid;
+		const email = req.params.email;
+
+		await emailService.saveEmail(uid, email);
+		res.send("1");
 	} catch (err) {
 		next(err);
 	}
