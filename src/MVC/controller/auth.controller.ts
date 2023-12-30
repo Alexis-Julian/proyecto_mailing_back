@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { UserService } from "../service/auth.service";
 import { AuthLogin } from "../../DTO/auth-login.dto";
+import createHttpError from "http-errors";
 // import { HttpErrorConstructor } from "http-errors";
 
 // Servicio para manipulara a los controladores
@@ -13,6 +14,7 @@ export const Login = async (
 ) => {
 	const userLogin: AuthLogin = req.body;
 	try {
+		console.log(req.body);
 		res.send(await ServiceUser.AuthLogin(userLogin));
 	} catch (err) {
 		next(err);

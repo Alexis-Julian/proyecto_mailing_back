@@ -1,8 +1,11 @@
-import jwt from "jsonwebtoken";
+import jwt, { JwtPayload } from "jsonwebtoken";
 import { JWT } from "../shares/constants";
 import "dotenv/config";
 import { UserObject } from "../middlewares/verifyToken";
-export function createToken(payload: any, expire: any) {
+export function createToken(
+	payload: any,
+	expire: any
+): Promise<string | undefined> {
 	/* Expire : 1hs : 1h , 1day: 1d */
 	return new Promise((resolve, reject) => {
 		jwt.sign(payload, JWT, { expiresIn: expire }, (e, token) => {
@@ -12,7 +15,9 @@ export function createToken(payload: any, expire: any) {
 	});
 }
 
-export function validateToken(token: string): Promise<any> {
+export function validateToken(
+	token: string
+): Promise<JwtPayload | string | undefined> {
 	return new Promise((resolve, reject) => {
 		jwt.verify(token, JWT, (e, token) => {
 			if (e) reject(e);
