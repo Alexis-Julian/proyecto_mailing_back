@@ -20,9 +20,10 @@ export const modifyEmail = async (
 	}
 };
 
-export const getEmail = (req: Request, res: Response) => {
-	console.log(req.session);
-	res.send("Probando");
+export const getEmail = async (req: Request, res: Response) => {
+	const uid = req.headers.uid;
+
+	res.send(await emailService.getEmail(uid));
 };
 
 export const saveEmail = async (
@@ -34,8 +35,7 @@ export const saveEmail = async (
 		const uid = req.headers.uid;
 		const email = req.params.email;
 
-		await emailService.saveEmail(uid, email);
-		res.send("1");
+		res.send(await emailService.saveEmail(uid, email));
 	} catch (err) {
 		next(err);
 	}
