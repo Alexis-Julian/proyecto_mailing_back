@@ -18,7 +18,7 @@ export const verifyToken = async (
 
 	if (!token) throw createHttpError(401, "Token not valid");
 
-	const response: UserObject = await validateToken(token);
+	const response: any = await validateToken(token);
 
 	req.headers.uid = response.uid;
 

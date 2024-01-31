@@ -23,7 +23,7 @@ export const modifyEmail = async (
 export const getEmail = async (req: Request, res: Response) => {
 	const uid = req.headers.uid;
 
-	res.send(await emailService.getEmail(uid));
+	if (uid) res.send(await emailService.getEmail(uid));
 };
 
 export const saveEmail = async (

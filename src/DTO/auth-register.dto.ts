@@ -1,6 +1,6 @@
 export interface AuthRegister {
+	first_name: string;
+	last_name: string;
 	email: string;
-	password: string;
-	name: string;
-	lastname: string;
+	password_account: string;
 }

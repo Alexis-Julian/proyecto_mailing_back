@@ -7,12 +7,11 @@ import { ResponseHTTP } from "../../shares/types";
 import createHttpError, * as createError from "http-errors";
 import { HttpError } from "http-errors";
 // import { createToken } from "../../libs/jwt";
-import { db, adminApp } from "../../firebase-config";
 
-import { doc, getDoc, setDoc } from "firebase/firestore";
+import { pool } from "../../libs/mysql";
 
 import { auth } from "../../firebase-config";
-
+import { ComparePassword, HashPassword } from "../../libs/bcrypt";
 import {
 	UserCredential,
 	signInWithEmailAndPassword,
@@ -21,58 +20,63 @@ import {
 import { createToken, validateToken } from "../../libs/jwt";
 import { JwtPayload } from "jsonwebtoken";
 
+/* ResponseHTTP<string> | HttpError */
 export class UserService {
-	async AuthLogin({
-		email,
-		password,
-	}: AuthLogin): Promise<ResponseHTTP<string> | HttpError> {
-		const getOtherFields = async (id: string) => {
-			const docSnap = await getDoc(doc(db, "users", id));
-			if (docSnap.exists()) return docSnap.data();
-		};
+	async AuthLogin({ email, password }: AuthLogin): Promise<any> {
+		console.log(email, password);
+		const response: Array<any> = await pool.query(
+			"SELECT email, password_account,first_name,last_name FROM users WHERE email = ?",
+			[email]
+		);
 
-		const response = await signInWithEmailAndPassword(auth, email, password);
-
-		const userOtherFields = await getOtherFields(response.user.uid);
-
-		const user = {
-			uid: response.user.uid,
-			email: response.user.email,
-			...userOtherFields,
-		};
-
-		const token: string | undefined = await createToken(user, "1d");
-
-		if (token)
+		if (response.length == 0)
 			return {
-				statusCode: 200,
-				message: "Successfully",
-				data: token,
+				statuscODE: 401,
+				message: "Unauthorized",
+				data: "Email not found",
 			};
 
-		return createHttpError(400, "Syntax error");
+		const [{ password_account, first_name, last_name }] = response;
+
+		const Authorized = await ComparePassword(password, password_account);
+
+		if (!Authorized)
+			return {
+				statuscODE: 401,
+				message: "Unauthorized",
+				data: "password is incorrect",
+			};
+
+		const payload = { email, first_name, last_name };
+
+		const token = await createToken(payload, "1d");
+
+		return {
+			statusCode: 200,
+			message: "Successfully",
+			data: token,
+		};
 	}
 
 	async AuthRegister(RegisterObject: AuthRegister): Promise<any> {
-		const { email, name, lastname, password } = RegisterObject;
+		const { first_name, last_name, email, password_account } = RegisterObject;
 
-		const createOtherFields = async (id: string) => {
-			await setDoc(doc(db, "users", id), { name, lastname, emails: [] });
-		};
+		const passwordHash = await HashPassword(password_account);
 
-		const response: UserCredential | any = await createUserWithEmailAndPassword(
-			auth,
-			email,
-			password
+		await pool.query(
+			`INSERT INTO users(first_name,last_name,email,password_account) VALUES(?,?,?,?)`,
+			[first_name, last_name, email, passwordHash]
 		);
 
-		await createOtherFields(response.user.uid);
+		const payload = { first_name, last_name, email };
 
-		const payload = { email, name, lastname, uid: response.user.uid };
+		const token = await createToken(payload, "1d");
 
-		const token = createToken(payload, "1d");
-
-		return token;
+		return {
+			statusCode: 201,
+			message: "Successfully",
+			data: token,
+		};
 	}
 
 	async AuthToken(

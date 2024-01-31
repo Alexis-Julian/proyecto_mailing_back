@@ -14,7 +14,6 @@ export const Login = async (
 ) => {
 	const userLogin: AuthLogin = req.body;
 	try {
-		console.log(req.body);
 		res.send(await ServiceUser.AuthLogin(userLogin));
 	} catch (err) {
 		next(err);
