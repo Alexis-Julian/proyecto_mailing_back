@@ -25,29 +25,29 @@ export class UserService {
 	async AuthLogin({ email, password }: AuthLogin): Promise<any> {
 		console.log(email, password);
 		const response: Array<any> = await pool.query(
-			"SELECT email, password_account,first_name,last_name FROM users WHERE email = ?",
+			"SELECT email, password_account,first_name,last_name,id_user FROM users WHERE email = ?",
 			[email]
 		);
-
+		console.log(response);
 		if (response.length == 0)
 			return {
-				statuscODE: 401,
+				statusCode: 401,
 				message: "Unauthorized",
 				data: "Email not found",
 			};
 
-		const [{ password_account, first_name, last_name }] = response;
+		const [{ password_account, first_name, last_name, id_user }] = response;
 
 		const Authorized = await ComparePassword(password, password_account);
 
 		if (!Authorized)
 			return {
-				statuscODE: 401,
+				statusCode: 401,
 				message: "Unauthorized",
 				data: "password is incorrect",
 			};
 
-		const payload = { email, first_name, last_name };
+		const payload = { uid: id_user, email, first_name, last_name };
 
 		const token = await createToken(payload, "1d");
 

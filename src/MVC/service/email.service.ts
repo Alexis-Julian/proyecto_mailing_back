@@ -1,39 +1,49 @@
 import { setDoc, getDoc, updateDoc, arrayUnion, doc } from "firebase/firestore";
 import { adminApp, db } from "../../firebase-config";
 import createHttpError from "http-errors";
+import { pool } from "../../libs/mysql";
 
 export default class emailService {
 	async modifyEmail(_email: string) {}
 
-	async getEmail(uid: any): Promise<string[] | undefined> {
-		const docRef = doc(db, "users", uid);
+	async getEmail(uid: any): Promise<any> {
+		const response: Array<any> = await pool.query(
+			"SELECT email_friend FROM mailing_db.friends WHERE id_user = ?",
+			[uid]
+		);
 
-		const response = await getDoc(docRef);
+		if (response.length == 0)
+			return {
+				statusCode: 200,
+				message: "OK",
+				data: "you not have email associated",
+			};
 
-		if (response.exists()) {
-			return response.data().emails;
-		} else {
-			return undefined;
-		}
+		return {
+			statusCode: 200,
+			message: "OK",
+			data: response.map((emails) => emails.email_friend),
+		};
 	}
 
 	async saveEmail(uid: any, email: string) {
-		const emailIsRepeated = async (email: string): Promise<boolean> => {
-			const response = await this.getEmail(uid);
+		const response: any = await pool.query(
+			"INSERT INTO friends(id_user,email_friend) VALUES (?, ?)",
+			[uid, email]
+		);
 
-			if (response) return response.some((e) => e === email);
+		if (response.length == 0)
+			return {
+				statusCode: 404,
+				message: "Error",
+				data: "Error",
+			};
 
-			return false;
+		return {
+			statusCode: 200,
+			message: "OK",
+			data: "Email successfully added",
 		};
-
-		if (await emailIsRepeated(email))
-			throw createHttpError(409, "Email already exists");
-
-		const docRef = doc(db, "users", uid);
-
-		await updateDoc(docRef, { emails: arrayUnion(email) });
-
-		return createHttpError(200, "success");
 	}
 
 	deleteEmail(email: string) {
