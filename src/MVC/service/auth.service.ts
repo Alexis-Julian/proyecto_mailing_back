@@ -58,17 +58,26 @@ export class UserService {
 		};
 	}
 
-	async AuthRegister(RegisterObject: AuthRegister): Promise<any> {
-		const { first_name, last_name, email, password_account } = RegisterObject;
+	async AuthRegister(RegisterObject: any): Promise<any> {
+		console.log(RegisterObject);
+		const { name, lastname, email, password } = RegisterObject;
 
-		const passwordHash = await HashPassword(password_account);
+		const passwordHash = await HashPassword(password);
 
 		await pool.query(
 			`INSERT INTO users(first_name,last_name,email,password_account) VALUES(?,?,?,?)`,
-			[first_name, last_name, email, passwordHash]
+			[name, lastname, email, passwordHash]
 		);
 
-		const payload = { first_name, last_name, email };
+		const response: Array<any> = await pool.query(
+			`SELECT id_user FROM mailing_db.users WHERE email = ? `,
+			[email]
+		);
+
+		if (response.length == 0)
+			return { statusCode: 404, message: "User not found" };
+
+		const payload = { uid: response[0].id_user, name, lastname, email };
 
 		const token = await createToken(payload, "1d");
 
