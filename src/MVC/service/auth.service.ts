@@ -22,13 +22,13 @@ import { JwtPayload } from "jsonwebtoken";
 
 /* ResponseHTTP<string> | HttpError */
 export class UserService {
-	async AuthLogin({ email, password }: AuthLogin): Promise<any> {
-		console.log(email, password);
+	async AuthLogin({ email, password }: any): Promise<any> {
 		const response: Array<any> = await pool.query(
 			"SELECT email, password_account,first_name,last_name,id_user FROM users WHERE email = ?",
 			[email]
 		);
 		console.log(response);
+
 		if (response.length == 0)
 			return {
 				statusCode: 401,

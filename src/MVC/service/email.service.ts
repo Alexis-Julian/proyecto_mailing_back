@@ -1,6 +1,3 @@
-import { setDoc, getDoc, updateDoc, arrayUnion, doc } from "firebase/firestore";
-import { adminApp, db } from "../../firebase-config";
-import createHttpError from "http-errors";
 import { pool } from "../../libs/mysql";
 
 export default class emailService {
@@ -8,7 +5,7 @@ export default class emailService {
 
 	async getEmail(uid: any): Promise<any> {
 		const response: Array<any> = await pool.query(
-			"SELECT email_friend FROM mailing_db.friends WHERE id_user = ?",
+			"SELECT email_friend,business,created_at FROM mailing_db.friends WHERE id_user = ?",
 			[uid]
 		);
 
@@ -22,7 +19,13 @@ export default class emailService {
 		return {
 			statusCode: 200,
 			message: "OK",
-			data: response.map((emails) => emails.email_friend),
+			data: response.map((data) => {
+				return {
+					email: data.email_friend,
+					business: data.business,
+					created_at: data.created_at,
+				};
+			}),
 		};
 	}
 
